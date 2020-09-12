@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # Get environment variable file
 load_dotenv()
-W_KEY= os.getenv('W_KEY')
+WEATHER_KEY= os.getenv('WEATHER_KEY')
 
 # Validate postal code
 def postal_validate(zip):
@@ -22,7 +22,7 @@ def postal_validate(zip):
 # Contact weather api and return body
 def get_weather_data(zip):
     if postal_validate(zip):
-        r = requests.get(f"https://api.openweathermap.org/data/2.5/weather?zip={zip},us&appid=" + W_KEY)
+        r = requests.get(f"https://api.openweathermap.org/data/2.5/weather?zip={zip},us&appid=" + WEATHER_KEY)
         body = r.json()
 
         return body
