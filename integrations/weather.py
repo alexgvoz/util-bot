@@ -1,12 +1,12 @@
 import os
-import json
 import requests
 import re
 from dotenv import load_dotenv
 
 # Get environment variable file
 load_dotenv()
-WEATHER_KEY= os.getenv('WEATHER_KEY')
+WEATHER_KEY = os.getenv("WEATHER_KEY")
+
 
 # Validate postal code
 def postal_validate(zip):
@@ -16,8 +16,9 @@ def postal_validate(zip):
 
     if m:
         return True
-    elif m is None:
+    else:
         return False
+
 
 # Contact weather api and return body
 def get_weather_data(zip):
@@ -29,9 +30,11 @@ def get_weather_data(zip):
     else:
         raise Exception("invalid zip code")
 
+
 # Kelvin to Celsius
 def to_celsius(t):
     return round(t - 273.15)
+
 
 # Kelvin to Fahrenheit
 def to_fahrenheit(t):
