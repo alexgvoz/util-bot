@@ -1,7 +1,9 @@
 from io import BytesIO
 from aiohttp import ClientSession
+from integrations import Integration
 
 
+class EpicGames(Integration):
 def x():
     async with ClientSession() as session:
         async with session.get(
