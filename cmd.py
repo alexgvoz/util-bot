@@ -1,10 +1,10 @@
 import sys
-from bot import client
-from integrations import weather
+from main import client
+from cogs import weather
 
 
 # Command that gets the weather for your zip code
-@client.command(name="w", help="Gets the weather for your zip code. (zip code, temperature scale)")
+@client.command(name="weather", help="Gets the weather for your zip code. (zip code, temperature scale)")
 async def get_weather(ctx, zip, temp_type="f"):
     data = None
 
