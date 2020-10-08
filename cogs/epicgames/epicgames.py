@@ -1,8 +1,13 @@
 import requests
+import discord
 
+from discord.ext import commands
+from datetime import datetime
 from cogs.epicgames import response
 
-def get_promos():
+
+# Grabs promos from Epic Store
+async def get_promos():
     r = requests.get(
         "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US")
     body = r.json()
@@ -11,12 +16,47 @@ def get_promos():
     return promos
 
 
-def get_image_urls(promos):
-    image_urls = []
+class EpicPromos(commands.Cog):
+    def __init__(self, client):
+        self.client = client
+        self.channel = self.client.get_channel(755242779076067358)
 
-    for promo in promos:
-        for image in promo["keyImages"]:
-            if image["type"] == "Thumbnail":
-                image_urls.append(image["url"])
+        self.post_promos()
 
-    return image_urls
+    async def post_promos(self):
+
+        promos = get_promos()
+
+        for i, promo in enumerate(promos):
+            date = promo.effective_date.strftime("%m/%d/%y")
+            today = datetime.now().strftime("%m/%d/%y")
+
+            if date > today:
+                continue
+
+            og_price = str(promo.price.total_price.original_price)
+            price = f"${og_price[:-2]}.{og_price[-2:]}"
+            try:
+                end_date = promo.promotions.promotional_offers[0].promotional_offers[0].end_date.strftime("%m/%d/%y")
+            except:
+                continue
+            dev = ""
+            thumbnail = ""
+
+            for image in promo.key_images:
+                if image.type == "Thumbnail":
+                    thumbnail = image.url
+
+            for atr in promo.custom_attributes:
+                if atr.key == "developerName":
+                    dev = atr.value
+
+            embed = discord.Embed(title=f"{promo.title}",
+                                  description=f"| Promo Dates: {date} - {end_date}\n"
+                                              f"| Developer: {dev}\n"
+                                              f"| Original Price: {price}",
+                                  color=discord.Color.blue(),
+                                  url=f"https://www.epicgames.com/store/product/{promo.product_slug}")
+            embed.set_image(url=thumbnail)
+
+            await self.channel.send(embed=embed)
