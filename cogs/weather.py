@@ -43,6 +43,7 @@ def to_celsius(t):
 def to_fahrenheit(t):
     return round((t - 273.15) * 9 / 5 + 32.0)
 
+
 # Weather command used in Discord
 class Weather(commands.Cog):
 

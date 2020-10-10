@@ -1,13 +1,13 @@
 import requests
 import discord
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 from datetime import datetime
 from cogs.epicgames import response
 
 
 # Grabs promos from Epic Store
-async def get_promos():
+def get_promos():
     r = requests.get(
         "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US")
     body = r.json()
@@ -16,18 +16,24 @@ async def get_promos():
     return promos
 
 
+def hours_until_thursday():
+    pass
+
+
 class EpicPromos(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.channel = self.client.get_channel(755242779076067358)
+        self.post_promos.start()
 
-        self.post_promos()
+        for guild in client.guilds:
+            if guild.name == "Nerds":
+                self.channel = guild.get_channel(755242779076067358)
 
+    @tasks.loop(hours=1)
     async def post_promos(self):
-
         promos = get_promos()
 
-        for i, promo in enumerate(promos):
+        for promo in promos:
             date = promo.effective_date.strftime("%m/%d/%y")
             today = datetime.now().strftime("%m/%d/%y")
 
@@ -60,3 +66,6 @@ class EpicPromos(commands.Cog):
             embed.set_image(url=thumbnail)
 
             await self.channel.send(embed=embed)
+
+    def cog_unload(self):
+        self.post_promos.cancel()
